@@ -1,7 +1,7 @@
 /**
  * Storage 封装
  */
-const STORAGE_KEY = 'mall';
+const STORAGE_KEY = "mall";
 export default {
   // 存储值
   setItem(key, value, module_name) {
@@ -12,7 +12,7 @@ export default {
     } else {
       let val = this.getStorage();
       val[key] = value;
-      window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(val))
+      window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(val));
     }
     let val = this.getStorage();
     val[key] = value;
@@ -28,7 +28,7 @@ export default {
   },
   // 获取Storage值
   getStorage() {
-    return JSON.parse(window.sessionStorage.getItem(STORAGE_KEY) || '{}');
+    return JSON.parse(window.sessionStorage.getItem(STORAGE_KEY) || "{}");
   },
   clear(key, module_name) {
     let val = this.getStorage();
