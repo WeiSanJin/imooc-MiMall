@@ -28,14 +28,10 @@
             <span>小米手机</span>
             <div class="children">
               <ul>
-                <li
-                  class="product"
-                  v-for="(item, index) in phoneList"
-                  :key="index"
-                >
+                <li class="product" v-for="(item, index) in phoneList" :key="index">
                   <a :href="'/#/product/' + item.id" target="_blank">
                     <div class="pro-img">
-                      <img :src="item.mainImage" :alt="item.subtitle" />
+                      <img v-lazy="item.mainImage" :alt="item.subtitle" />
                     </div>
                     <div class="pro-name">{{ item.name }}</div>
                     <div class="pro-price">{{ item.price | currency }}</div>
@@ -52,14 +48,10 @@
             <span>电视</span>
             <div class="children">
               <ul>
-                <li
-                  class="product"
-                  v-for="(item, index) in mobileMenu"
-                  :key="index"
-                >
+                <li class="product" v-for="(item, index) in mobileMenu" :key="index">
                   <a href target="_blank">
                     <div class="pro-img">
-                      <img :src="item.img" alt />
+                      <img v-lazy="item.img" alt />
                     </div>
                     <div class="pro-name">{{ item.name }}</div>
                     <div class="pro-price">{{ item.price }}</div>
@@ -291,6 +283,7 @@ export default {
             box-shadow: 0px 7px 6px 0px rgba(0, 0, 0, 0.11);
             z-index: 10;
             transition: all 0.5s;
+            background-color: $colorG;
             .product {
               position: relative; // 绝对定位
               float: left;
