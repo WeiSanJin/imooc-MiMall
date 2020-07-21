@@ -2,6 +2,7 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import Home from "../views/Home.vue";
 import Index from "../views/index.vue";
+import Login from "../views/login.vue";
 import Product from "../views/product.vue";
 import Detail from "../views/detail.vue";
 import Cart from "../views/cart.vue";
@@ -23,24 +24,29 @@ const routes = [
       {
         path: "/index",
         name: "index",
-        component: Index
+        component: Index,
       },
       {
         path: "/product/:id",
         name: "product",
-        component: Product
+        component: Product,
       },
       {
         path: "/detail/:id",
         name: "detail",
-        component: Detail
-      }
-    ]
+        component: Detail,
+      },
+    ],
+  },
+  {
+    path: "/login",
+    name: "login",
+    component: Login,
   },
   {
     path: "/cart",
     name: "cart",
-    component: Cart
+    component: Cart,
   },
   {
     path: "/order",
@@ -50,29 +56,29 @@ const routes = [
       {
         path: "list",
         name: "order-list",
-        component: OrderList
+        component: OrderList,
       },
       {
         path: "confirm",
         name: "order-confirm",
-        component: OrderConfirm
+        component: OrderConfirm,
       },
       {
         path: "pay",
         name: "order-pay",
-        component: OrderPay
+        component: OrderPay,
       },
       {
         path: "alipay",
         name: "alipay",
-        component: AliPay
-      }
-    ]
-  }
+        component: AliPay,
+      },
+    ],
+  },
 ];
 
 const router = new VueRouter({
-  routes
+  routes,
 });
 
 export default router;
