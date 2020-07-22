@@ -45,6 +45,7 @@
 </template>
 
 <script>
+import { mapActions } from "vuex";
 export default {
   name: "login",
   data() {
@@ -74,6 +75,8 @@ export default {
           console.log(res);
           // cookie名称：userId 值：res.id 过期时间：1个月
           this.$cookie.set("userId", res.id, { expires: "1M" });
+          // this.$store.dispatch("saveUserName", res.username);
+          this.saveUserName(res.username);
           this.$router.push("/index");
         })
         .catch(() => {
@@ -82,6 +85,7 @@ export default {
           console.log("用户名不存在");
         });
     },
+    ...mapActions(["saveUserName"]),
     register() {
       let random = Math.floor(Math.random() * 6666 + 1);
       this.axios

@@ -5,6 +5,7 @@ import VueAxios from "vue-axios";
 import App from "./App.vue";
 import VueLazyLoad from "vue-lazyload";
 import VueCookie from "vue-cookie";
+import store from './store';
 // import env from "./env.js";
 
 // 根据前端的跨域方式做调整
@@ -37,6 +38,7 @@ Vue.use(VueLazyLoad, {
 Vue.config.productionTip = false;
 
 new Vue({
+  store,
   router,
   render: (h) => h(App),
 }).$mount("#app");

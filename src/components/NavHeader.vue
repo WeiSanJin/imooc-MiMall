@@ -9,11 +9,12 @@
           <a href="javascript:;">协议规则</a>
         </div>
         <div class="topbar-user">
-          <a href="javascript:;" v-if="username">{{ username }}</a>
-          <a href="javascript:;" v-if="!username" @click="login">登录</a>
-          <a href="javascript:;" v-if="username">我的订单</a>
+          <a href="javascript:;" v-if="userName">{{ userName }}</a>
+          <a href="javascript:;" v-if="!userName" @click="login">登录</a>
+          <a href="javascript:;" v-if="userName">我的订单</a>
           <a href="javascript:;" class="my-cart" @click="goTocart">
-            <span class="icon-cart"></span>购物车
+            <span class="icon-cart"></span>
+            购物车({{cartCount}})
           </a>
         </div>
       </div>
@@ -72,6 +73,7 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
 export default {
   name: "nav-header",
   data() {
@@ -152,10 +154,17 @@ export default {
           price: "19999.00元"
         }
       ],
-      // username: "weisanjin",
-      username: "",
       phoneList: []
     };
+  },
+  computed: {
+    // userName() {
+    //   return this.$store.state.username;
+    // },
+    // cartCount() {
+    //   return this.$store.state.cartCount;
+    // }
+    ...mapState(["userName", "cartCount"])
   },
   filters: {
     // 过滤器
