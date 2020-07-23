@@ -338,7 +338,7 @@ export default {
                 height: 100px;
                 width: 1px;
               }
-              &:last-child::before {
+              &:last-child:before {
                 display: none;
               }
             }
