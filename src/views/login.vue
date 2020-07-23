@@ -17,7 +17,11 @@
             <input type="text" placeholder="请输入帐号" v-model="username" />
           </div>
           <div class="input">
-            <input type="password" placeholder="请输入密码" v-model="password" />
+            <input
+              type="password"
+              placeholder="请输入密码"
+              v-model="password"
+            />
           </div>
           <div class="btn-box">
             <a href="javascript:;" class="btn" @click="login">登录</a>
@@ -36,10 +40,14 @@
       <div class="footer-link">
         <div class="link-list" v-for="(item, index) in linkList" :key="index">
           <a href="http://www.weisanjin.com" target="_blank">{{ item }}</a>
-          <span class="link-every" v-show="index != linkList.length - 1">|</span>
+          <span class="link-every" v-show="index != linkList.length - 1"
+            >|</span
+          >
         </div>
       </div>
-      <p class="copyright">Copyright ©2020 weisanjin.com All Rights Reserved.</p>
+      <p class="copyright">
+        Copyright ©2020 weisanjin.com All Rights Reserved.
+      </p>
     </div>
   </div>
 </template>

@@ -87,7 +87,7 @@
                   <div class="item-info">
                     <h3>{{ item.name }}</h3>
                     <p>{{ item.subtitle }}</p>
-                    <p class="price" @click="addCart()">{{ item.price }}元</p>
+                    <p class="price" @click="addCart(item.id)">{{ item.price }}元</p>
                   </div>
                 </div>
               </div>
@@ -96,6 +96,7 @@
         </div>
       </div>
       <service-bar></service-bar>
+      <!-- 模态框 -->
       <modal
         title="提示"
         sureText="查看购物车"
@@ -246,14 +247,17 @@ export default {
       return val > 1000 ? "新品" : "秒杀";
     },
     // 添加购物车
-    addCart() {
-      this.showModals = true;
-      // this.axios.post("/carts", {
-      //     productId: id,
-      //     selected: true
-      //   })
-      //   .then(() => {})
-      //   .catch(() => {});
+    addCart(id) {
+      this.axios
+        .post("/carts", {
+          productId: id,
+          selected: true
+        })
+        .then(res => {
+          this.showModals = true;
+          this.$store.dispatch("saveCartCount", res.cartTotalQuantity);
+        })
+        .catch(() => {});
     },
     goToCart() {
       this.$router.push("/cart");

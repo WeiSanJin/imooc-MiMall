@@ -5,7 +5,7 @@ import VueAxios from "vue-axios";
 import App from "./App.vue";
 import VueLazyLoad from "vue-lazyload";
 import VueCookie from "vue-cookie";
-import store from './store';
+import store from "./store";
 // import env from "./env.js";
 
 // 根据前端的跨域方式做调整
@@ -21,9 +21,10 @@ axios.interceptors.response.use((response) => {
   if (res.status == 0) {
     return res.data;
   } else if (res.status == 10) {
-    if (path != '#/index') {
+    if (path != "#/index") {
       window.location.href = "/#/login";
     }
+    return Promise.reject(res);
   } else {
     alert(res.msg);
     return Promise.reject(res);
@@ -33,12 +34,12 @@ axios.interceptors.response.use((response) => {
 Vue.use(VueAxios, axios);
 Vue.use(VueCookie);
 Vue.use(VueLazyLoad, {
-  loading: "/imgs/loading-svg/loading-bars.svg",
+  loading: "/imgs/loading-svg/loading-bars.svg"
 });
 Vue.config.productionTip = false;
 
 new Vue({
   store,
   router,
-  render: (h) => h(App),
+  render: h => h(App)
 }).$mount("#app");
