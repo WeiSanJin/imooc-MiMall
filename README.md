@@ -6,7 +6,8 @@
 ![imooc-MiMall-login](http://img.weisanjin.com/imooc-mimal-loginl.png)
 <font color="#33CCFF" size='4'>**产品站页面**</font>
 ![imooc-mimall-product](http://img.weisanjin.com/imooc-mimall-product.png)
-
+<font color="#33CCFF" size='4'>**商品详情页面**</font>
+![imooc-mimall-detail](http://img.weisanjin.com/imooc-mimall-detail.png)
 ## Project setup
 
 ```
