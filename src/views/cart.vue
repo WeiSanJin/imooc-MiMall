@@ -1,21 +1,14 @@
 <template>
   <div class="cart">
     <order-header title="我的购物车">
-      <span slot="tip"
-        >温馨提示：产品是否购买成功，以最终下单为准哦，请尽快结算</span
-      >
+      <span slot="tip">温馨提示：产品是否购买成功，以最终下单为准哦，请尽快结算</span>
     </order-header>
     <div class="wrapper">
       <div class="container">
         <div class="cart-box">
           <ul class="cart-item-head">
             <li class="col-1">
-              <span
-                class="checkbox"
-                v-bind:class="{ checked: allChecked }"
-                @click="toggleAll"
-              ></span
-              >全选
+              <span class="checkbox" v-bind:class="{ checked: allChecked }" @click="toggleAll"></span>全选
             </li>
             <li class="col-3">商品名称</li>
             <li class="col-1">单价</li>
@@ -34,9 +27,11 @@
               </div>
               <div class="item-name">
                 <img v-lazy="item.productMainImage" alt />
-                <span>{{
+                <span>
+                  {{
                   item.productName + " , " + item.productSubtitle
-                }}</span>
+                  }}
+                </span>
               </div>
               <div class="item-price">{{ item.productPrice }}元</div>
               <div class="item-num">
@@ -55,12 +50,7 @@
               </div>
               <div class="item-total">
                 <!-- startVal：开始数值，endVal：结束数值，duration：持续时间，以毫秒为单位 -->
-                <countTo
-                  :startVal="0"
-                  :endVal="item.productTotalPrice"
-                  :duration="1000"
-                ></countTo
-                >元
+                <countTo :startVal="0" :endVal="item.productTotalPrice" :duration="1000"></countTo>元
               </div>
               <div class="item-del" @click="openModal(item)"></div>
             </li>
@@ -70,19 +60,14 @@
           <div class="cart-tip fl">
             <a href="/">继续购物</a>
             共
-            <span>{{ list.length }}</span
-            >件商品，已选择 <span>{{ checkedNum }}</span
-            >件
+            <span>{{ list.length }}</span>件商品，已选择
+            <span>{{ checkedNum }}</span>件
           </div>
           <div class="total fr">
             合计：
             <span>
-              <countTo
-                :startVal="0"
-                :endVal="cartTotalPrice"
-                :duration="1000"
-              ></countTo> </span
-            >元
+              <countTo :startVal="0" :endVal="cartTotalPrice" :duration="1000"></countTo>
+            </span>元
             <a href="javascript:;" class="btn" @click="order">去结算</a>
           </div>
         </div>
@@ -103,10 +88,10 @@
       <template v-slot:body>
         <p>
           您确定要删除{{
-            delProductInof.productName +
-              " , " +
-              delProductInof.productSubtitle +
-              "！"
+          delProductInof.productName +
+          " , " +
+          delProductInof.productSubtitle +
+          "！"
           }}
         </p>
       </template>
@@ -150,19 +135,59 @@ export default {
         this.renderData(res);
       });
     },
-    // 控制购物车全选功能
-    toggleAll() {
-      let url = this.allChecked ? "/carts/unSelectAll" : "/carts/selectAll";
-      this.axios.put(url).then(res => {
-        this.renderData(res);
-      });
-    },
     // 公共赋值
     renderData(res) {
       this.list = res.cartProductVoList || [];
       this.allChecked = res.selectedAll;
       this.cartTotalPrice = res.cartTotalPrice;
       this.checkedNum = this.list.filter(item => item.productSelected).length;
+    },
+    // 删除购物车商品
+    delProduct() {
+      let productId = this.delProductInof.productId;
+      this.axios
+        .delete(`/carts/${productId}`, {
+          productId
+        })
+        .then(res => {
+          this.showModal = false;
+          this.renderData(res);
+          this.$notify({
+            title: "删除成功",
+            message:
+              this.delProductInof.productName +
+              " , " +
+              this.delProductInof.productSubtitle,
+            type: "success"
+          });
+        });
+    },
+    // 结算
+    order() {
+      /* every()方法测试一个数组内的所有元素是否都能通过某个指定函数的测试。它返回一个布尔值。
+      注意：若收到一个空数组，此方法在一切情况下都会返回 true。*/
+      let isCheck = this.list.every(item => !item.productSelected);
+      if (isCheck) {
+        this.$notify({
+          title: "警告",
+          message: "您还没选择商品！",
+          type: "warning"
+        });
+      } else {
+        this.$router.push("/order/confirm");
+      }
+    },
+    // 显示模态框
+    openModal(item) {
+      this.delProductInof = item;
+      this.showModal = true;
+    },
+    // 控制购物车全选功能
+    toggleAll() {
+      let url = this.allChecked ? "/carts/unSelectAll" : "/carts/selectAll";
+      this.axios.put(url).then(res => {
+        this.renderData(res);
+      });
     },
     // 更新购物车数量和购物车单选状态
     updataCart(item, type) {
@@ -171,14 +196,22 @@ export default {
       // 通过点击"-"按钮减少一件商品,当商品剩下1件时再次点击提示用户。
       if (type == "-") {
         if (quantity == 1) {
-          alert("商品至少保留一件!");
+          this.$notify({
+            title: "警告",
+            message: "商品至少保留一件！",
+            type: "warning"
+          });
           return;
         }
         --quantity;
         // 通过点击"+"按钮增加一件商品,当商品大于库存时提示用户。
       } else if (type == "+") {
         if (quantity > item.productStock) {
-          alert("当前商品库存数量不足！");
+          this.$notify({
+            title: "警告",
+            message: "当前商品库存数量不足！",
+            type: "warning"
+          });
           return;
         }
         ++quantity;
@@ -190,7 +223,11 @@ export default {
               index.quantity = 1;
             }
           });
-          alert("请输入正确数量！");
+          this.$notify({
+            title: "警告",
+            message: "请输入正确数量！",
+            type: "warning"
+          });
           return;
         }
         // 当函数第二个参数为空时，更新商品选中状态
@@ -205,34 +242,6 @@ export default {
         .then(res => {
           this.renderData(res);
         });
-    },
-    // 删除购物车商品
-    delProduct() {
-      let productId = this.delProductInof.productId;
-      this.axios
-        .delete(`/carts/${productId}`, {
-          productId
-        })
-        .then(res => {
-          this.showModal = false;
-          this.renderData(res);
-        });
-    },
-    // 显示模态框
-    openModal(item) {
-      this.delProductInof = item;
-      this.showModal = true;
-    },
-    // 结算
-    order() {
-      /* every()方法测试一个数组内的所有元素是否都能通过某个指定函数的测试。它返回一个布尔值。
-      注意：若收到一个空数组，此方法在一切情况下都会返回 true。*/
-      let isCheck = this.list.every(item => !item.productSelected);
-      if (isCheck) {
-        alert("您还没选择商品");
-      } else {
-        this.$router.push("/order/confirm");
-      }
     }
   }
 };

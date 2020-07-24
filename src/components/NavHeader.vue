@@ -29,11 +29,7 @@
             <span>小米手机</span>
             <div class="children">
               <ul>
-                <li
-                  class="product"
-                  v-for="(item, index) in phoneList"
-                  :key="index"
-                >
+                <li class="product" v-for="(item, index) in phoneList" :key="index">
                   <a :href="'/#/product/' + item.id" target="_blank">
                     <div class="pro-img">
                       <img v-lazy="item.mainImage" :alt="item.subtitle" />
@@ -52,11 +48,7 @@
             <span>电视</span>
             <div class="children">
               <ul>
-                <li
-                  class="product"
-                  v-for="(item, index) in mobileMenu"
-                  :key="index"
-                >
+                <li class="product" v-for="(item, index) in mobileMenu" :key="index">
                   <a href target="_blank">
                     <div class="pro-img">
                       <img v-lazy="item.img" alt />

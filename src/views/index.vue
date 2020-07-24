@@ -259,9 +259,11 @@ export default {
         })
         .catch(() => {});
     },
+    // 跳转至购物车
     goToCart() {
       this.$router.push("/cart");
     },
+    // 关闭模态框
     closeModal() {
       this.showModals = false;
     }
