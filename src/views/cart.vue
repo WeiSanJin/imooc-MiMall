@@ -1,14 +1,21 @@
 <template>
   <div class="cart">
     <order-header title="我的购物车">
-      <span slot="tip">温馨提示：产品是否购买成功，以最终下单为准哦，请尽快结算</span>
+      <span slot="tip"
+        >温馨提示：产品是否购买成功，以最终下单为准哦，请尽快结算</span
+      >
     </order-header>
     <div class="wrapper">
       <div class="container">
         <div class="cart-box">
           <ul class="cart-item-head">
             <li class="col-1">
-              <span class="checkbox" v-bind:class="{ checked: allChecked }" @click="toggleAll"></span>全选
+              <span
+                class="checkbox"
+                v-bind:class="{ checked: allChecked }"
+                @click="toggleAll"
+              ></span
+              >全选
             </li>
             <li class="col-3">商品名称</li>
             <li class="col-1">单价</li>
@@ -28,9 +35,7 @@
               <div class="item-name">
                 <img v-lazy="item.productMainImage" alt />
                 <span>
-                  {{
-                  item.productName + " , " + item.productSubtitle
-                  }}
+                  {{ item.productName + " , " + item.productSubtitle }}
                 </span>
               </div>
               <div class="item-price">{{ item.productPrice }}元</div>
@@ -50,7 +55,12 @@
               </div>
               <div class="item-total">
                 <!-- startVal：开始数值，endVal：结束数值，duration：持续时间，以毫秒为单位 -->
-                <countTo :startVal="0" :endVal="item.productTotalPrice" :duration="1000"></countTo>元
+                <countTo
+                  :startVal="0"
+                  :endVal="item.productTotalPrice"
+                  :duration="1000"
+                ></countTo
+                >元
               </div>
               <div class="item-del" @click="openModal(item)"></div>
             </li>
@@ -60,14 +70,19 @@
           <div class="cart-tip fl">
             <a href="/">继续购物</a>
             共
-            <span>{{ list.length }}</span>件商品，已选择
-            <span>{{ checkedNum }}</span>件
+            <span>{{ list.length }}</span
+            >件商品，已选择 <span>{{ checkedNum }}</span
+            >件
           </div>
           <div class="total fr">
             合计：
             <span>
-              <countTo :startVal="0" :endVal="cartTotalPrice" :duration="1000"></countTo>
-            </span>元
+              <countTo
+                :startVal="0"
+                :endVal="cartTotalPrice"
+                :duration="1000"
+              ></countTo> </span
+            >元
             <a href="javascript:;" class="btn" @click="order">去结算</a>
           </div>
         </div>
@@ -88,10 +103,10 @@
       <template v-slot:body>
         <p>
           您确定要删除{{
-          delProductInof.productName +
-          " , " +
-          delProductInof.productSubtitle +
-          "！"
+            delProductInof.productName +
+              " , " +
+              delProductInof.productSubtitle +
+              "！"
           }}
         </p>
       </template>

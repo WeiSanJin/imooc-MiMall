@@ -5,8 +5,8 @@ import VueAxios from "vue-axios";
 import App from "./App.vue";
 import VueLazyLoad from "vue-lazyload";
 import VueCookie from "vue-cookie";
-import { Message, Notification } from 'element-ui';
-import 'element-ui/lib/theme-chalk/index.css';
+import { Message, Notification } from "element-ui";
+import "element-ui/lib/theme-chalk/index.css";
 import store from "./store";
 // import env from "./env.js";
 

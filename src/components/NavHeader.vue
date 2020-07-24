@@ -11,6 +11,7 @@
         <div class="topbar-user">
           <a href="javascript:;" v-if="userName">{{ userName }}</a>
           <a href="javascript:;" v-if="!userName" @click="login">登录</a>
+          <a href="javascript:;" v-if="userName" @click="logout">退出</a>
           <a href="javascript:;" v-if="userName">我的订单</a>
           <a href="javascript:;" class="my-cart" @click="goTocart">
             <span class="icon-cart"></span>
@@ -29,7 +30,11 @@
             <span>小米手机</span>
             <div class="children">
               <ul>
-                <li class="product" v-for="(item, index) in phoneList" :key="index">
+                <li
+                  class="product"
+                  v-for="(item, index) in phoneList"
+                  :key="index"
+                >
                   <a :href="'/#/product/' + item.id" target="_blank">
                     <div class="pro-img">
                       <img v-lazy="item.mainImage" :alt="item.subtitle" />
@@ -48,7 +53,11 @@
             <span>电视</span>
             <div class="children">
               <ul>
-                <li class="product" v-for="(item, index) in mobileMenu" :key="index">
+                <li
+                  class="product"
+                  v-for="(item, index) in mobileMenu"
+                  :key="index"
+                >
                   <a href target="_blank">
                     <div class="pro-img">
                       <img v-lazy="item.img" alt />
@@ -175,6 +184,10 @@ export default {
   },
   mounted() {
     this.getProductList();
+    let params = this.$route.params;
+    if (params && params.from == "login") {
+      this.getCartCount();
+    }
   },
   methods: {
     getProductList() {
@@ -191,11 +204,33 @@ export default {
           }
         });
     },
+    getCartCount() {
+      this.axios.get("/carts/products/sum").then((res = 0) => {
+        // to-do 保存到Vuex里面
+        this.$store.dispatch("saveCartCount", res);
+      });
+    },
     goTocart() {
       this.$router.push("/cart");
     },
     login() {
       this.$router.push("/login");
+    },
+    // 登出
+    logout() {
+      this.axios.post("/user/logout").then(() => {
+        this.$notify({
+          title: "退出成功",
+          dangerouslyUseHTMLString: true,
+          message: `<br><h3>用户： ${this.userName}  退出成功</h3>`,
+          type: "success",
+          duration: 2000
+        });
+        // cookie名称：userId 值："" 过期时间：立刻过期
+        this.$cookie.set("userId", "", { expires: "-1" });
+        this.$store.dispatch("saveUserName", "");
+        this.$store.dispatch("saveCartCount", 0);
+      });
     }
   }
 };

@@ -17,7 +17,11 @@
             <input type="text" placeholder="请输入帐号" v-model="username" />
           </div>
           <div class="input">
-            <input type="password" placeholder="请输入密码" v-model="password" />
+            <input
+              type="password"
+              placeholder="请输入密码"
+              v-model="password"
+            />
           </div>
           <div class="btn-box">
             <a href="javascript:;" class="btn" @click="login">登录</a>
@@ -36,10 +40,14 @@
       <div class="footer-link">
         <div class="link-list" v-for="(item, index) in linkList" :key="index">
           <a href="http://www.weisanjin.com" target="_blank">{{ item }}</a>
-          <span class="link-every" v-show="index != linkList.length - 1">|</span>
+          <span class="link-every" v-show="index != linkList.length - 1"
+            >|</span
+          >
         </div>
       </div>
-      <p class="copyright">Copyright ©2020 weisanjin.com All Rights Reserved.</p>
+      <p class="copyright">
+        Copyright ©2020 weisanjin.com All Rights Reserved.
+      </p>
     </div>
   </div>
 </template>
@@ -50,8 +58,8 @@ export default {
   name: "login",
   data() {
     return {
-      username: "",
-      password: "",
+      username: "weisanjin.1792",
+      password: "weisanjin.1792",
       userId: "",
       linkList: [
         "我的主页",
@@ -72,17 +80,26 @@ export default {
           password
         })
         .then(res => {
-          console.log(res);
-          // cookie名称：userId 值：res.id 过期时间：1个月
-          this.$cookie.set("userId", res.id, { expires: "1M" });
+          this.$notify({
+            title: "登录成功",
+            dangerouslyUseHTMLString: true,
+            message: `<br><h3>欢迎  ${username} 回来</h3>`,
+            type: "success",
+            duration: 2000
+          });
+          // cookie名称：userId 值：res.id 过期时间：浏览器关闭即过期
+          this.$cookie.set("userId", res.id, { expires: "Session" });
           // this.$store.dispatch("saveUserName", res.username);
           this.saveUserName(res.username);
-          this.$router.push("/index");
+          this.$router.push({ name: "index", params: { from: "login" } });
         })
         .catch(() => {
           this.username = "";
           this.password = "";
-          console.log("用户名不存在");
+          this.$notify.error({
+            title: "错误",
+            message: "用户名不存在！"
+          });
         });
     },
     ...mapActions(["saveUserName"]),
