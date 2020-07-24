@@ -8,6 +8,8 @@
 ![imooc-mimall-product](http://img.weisanjin.com/imooc-mimall-product.png)
 <font color="#33CCFF" size='4'>**商品详情页面**</font>
 ![imooc-mimall-detail](http://img.weisanjin.com/imooc-mimall-detail.png)
+<font color="#33CCFF" size='4'>**购物车页面**</font>
+![imooc-mimall-cart](http://img.weisanjin.com/imooc-mimall-cart.png)
 ## Project setup
 
 ```

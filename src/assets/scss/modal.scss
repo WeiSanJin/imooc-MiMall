@@ -33,10 +33,15 @@
                     transform: scale(1.5);
                 }
             }
+            span{
+                font-weight: bold;
+            }
         }
         .modal-body{
             padding: 42px 40px 54px;
-            font-size: 14px;
+            text-align: center;
+            font-size: 16px;
+            // font-weight: bold;
         }
         .modal-footer{
             height: 82px;
