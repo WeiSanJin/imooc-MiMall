@@ -248,16 +248,25 @@ export default {
     },
     // 添加购物车
     addCart(id) {
+      if (this.$store.state.userName != "") {
+        this.showModals = true;
+      }
       this.axios
         .post("/carts", {
           productId: id,
           selected: true
         })
         .then(res => {
-          this.showModals = true;
+          // this.showModals = true;
           this.$store.dispatch("saveCartCount", res.cartTotalQuantity);
         })
-        .catch(() => {});
+        .catch(() => {
+          this.$notify({
+            title: "警告",
+            message: "完蛋！我和后端失去了联系",
+            type: "error"
+          });
+        });
     },
     // 跳转至购物车
     goToCart() {

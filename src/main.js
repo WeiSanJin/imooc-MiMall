@@ -10,6 +10,15 @@ import "element-ui/lib/theme-chalk/index.css";
 import store from "./store";
 // import env from "./env.js";
 
+Vue.use(VueAxios, axios);
+Vue.use(VueCookie);
+Vue.use(VueLazyLoad, {
+  loading: "/imgs/loading-svg/loading-bars.svg"
+});
+Vue.prototype.$message = Message;
+Vue.prototype.$notify = Notification;
+Vue.config.productionTip = false;
+
 // 根据前端的跨域方式做调整
 axios.defaults.baseURL = "/api";
 axios.defaults.timeout = 8000;
@@ -26,21 +35,20 @@ axios.interceptors.response.use((response) => {
     if (path != "#/index") {
       window.location.href = "/#/login";
     }
-    return Promise.reject(res);
+    return new Promise(resolve => {
+      Vue.prototype.$notify({
+        title: "错误信息",
+        dangerouslyUseHTMLString: true,
+        message: "<br><h3>敲你妈，没登录我怎么知道你购物车有什么？</h3>",
+        type: "error"
+      });
+      resolve("未登录");
+    });
   } else {
-    this.message.warning(res.msg);
+    Vue.prototype.$message(res.msg);
     return Promise.reject(res);
   }
 });
-
-Vue.use(VueAxios, axios);
-Vue.use(VueCookie);
-Vue.use(VueLazyLoad, {
-  loading: "/imgs/loading-svg/loading-bars.svg"
-});
-Vue.prototype.$message = Message;
-Vue.prototype.$notify = Notification;
-Vue.config.productionTip = false;
 
 new Vue({
   store,
