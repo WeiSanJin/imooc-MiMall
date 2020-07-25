@@ -34,9 +34,9 @@
               </div>
               <div class="item-name">
                 <img v-lazy="item.productMainImage" alt />
-                <span>
-                  {{ item.productName + " , " + item.productSubtitle }}
-                </span>
+                <span>{{
+                  item.productName + " , " + item.productSubtitle
+                }}</span>
               </div>
               <div class="item-price">{{ item.productPrice }}元</div>
               <div class="item-num">
@@ -221,7 +221,7 @@ export default {
         --quantity;
         // 通过点击"+"按钮增加一件商品,当商品大于库存时提示用户。
       } else if (type == "+") {
-        if (quantity > item.productStock) {
+        if (quantity >= item.productStock) {
           this.$notify({
             title: "警告",
             message: "当前商品库存数量不足！",
