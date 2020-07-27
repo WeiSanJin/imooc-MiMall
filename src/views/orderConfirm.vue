@@ -48,7 +48,13 @@
           <div class="item-address">
             <h2 class="addr-title">收货地址</h2>
             <div class="addr-list clearfix">
-              <div class="addr-info" v-for="(item, index) in list" :key="index">
+              <div
+                class="addr-info"
+                :class="{ checked: index == checkIndex }"
+                v-for="(item, index) in list"
+                :key="index"
+                @click="checkIndex = index"
+              >
                 <h2>{{ item.receiverName }}</h2>
                 <div class="phone">{{ item.receiverMobile }}</div>
                 <div class="street">
@@ -68,7 +74,11 @@
                       <use xlink:href="#icon-del" />
                     </svg>
                   </a>
-                  <a href="javascript:;" class="fr">
+                  <a
+                    href="javascript:;"
+                    class="fr"
+                    @click="editAddressModal(item)"
+                  >
                     <svg class="icon icon-edit">
                       <use xlink:href="#icon-edit" />
                     </svg>
@@ -87,9 +97,9 @@
               <li v-for="(item, index) in cartList" :key="index">
                 <div class="good-name">
                   <img v-lazy="item.productMainImage" :alt="item.productName" />
-                  <span>
-                    {{ item.productName + " " + item.productSubtitle }}
-                  </span>
+                  <span>{{
+                    item.productName + " " + item.productSubtitle
+                  }}</span>
                 </div>
                 <div class="good-price">
                   {{ item.productPrice }}元 x {{ item.quantity }}
@@ -251,7 +261,8 @@ export default {
       checkedItem: {}, // 选中的商品对象
       userAction: "", // 用户行为 0：新增  1：编辑  2：删除
       showEditModal: false, // 控制修改、新增模态框
-      showDelModal: false // 控制删除模态框
+      showDelModal: false, // 控制删除模态框
+      checkIndex: 0 // 当前收货地址选中的索引
     };
   },
   mounted() {
@@ -316,7 +327,7 @@ export default {
           !receiverAddress
         ) {
           errMsg = "请输入收货地址！";
-        } else if (!/\d{6}/.test(receiverZip)) {
+        } else if (!/\d{6}/.test(receiverZip) || receiverZip.length > 6) {
           errMsg = "请输入六位邮编！";
         }
         if (errMsg) {
@@ -363,6 +374,11 @@ export default {
       this.userAction = 0;
       this.showEditModal = true;
     },
+    editAddressModal(item) {
+      this.userAction = 1;
+      this.checkedItem = item;
+      this.showEditModal = true;
+    },
     // 清空地址信息、重置用户行为标识、关闭删除模态框
     closeModal() {
       this.checkedItem = {};
@@ -370,7 +386,30 @@ export default {
       this.showDelModal = false;
       this.showEditModal = false;
     },
-    orderSubmit() {},
+    // 订单提交
+    orderSubmit() {
+      let item = this.list[this.checkIndex];
+      if (!item) {
+        this.$notify({
+          title: "警告",
+          message: "请选择收货地址！",
+          type: "warning"
+        });
+        return;
+      }
+      this.axios
+        .post("/orders", {
+          shippingId: item.id
+        })
+        .then(res => {
+          this.$router.push({
+            path: "/order/pay",
+            query: {
+              orderNo: res.orderNo
+            }
+          });
+        });
+    },
     // 三级联动省、市、区事件
     onSelected(item) {
       this.checkedItem.receiverProvince = item.province.value;
