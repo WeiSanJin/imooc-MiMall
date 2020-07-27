@@ -63,7 +63,7 @@
                   {{ item.receiverAddress }}
                 </div>
                 <div class="action">
-                  <a href="javascript:;" class="fl">
+                  <a href="javascript:;" class="fl" @click="delAddress(item)">
                     <svg class="icon icon-del">
                       <use xlink:href="#icon-del" />
                     </svg>
@@ -87,14 +87,21 @@
               <li v-for="(item, index) in cartList" :key="index">
                 <div class="good-name">
                   <img v-lazy="item.productMainImage" :alt="item.productName" />
-                  <span>{{
-                    item.productName + " " + item.productSubtitle
-                  }}</span>
+                  <span>
+                    {{ item.productName + " " + item.productSubtitle }}
+                  </span>
                 </div>
                 <div class="good-price">
                   {{ item.productPrice }}元 x {{ item.quantity }}
                 </div>
-                <div class="good-total">{{ item.productTotalPrice }}元</div>
+                <div class="good-total">
+                  <countTo
+                    :startVal="0"
+                    :endVal="item.productTotalPrice"
+                    :duration="1500"
+                  ></countTo
+                  >元
+                </div>
               </li>
             </ul>
           </div>
@@ -110,11 +117,25 @@
           <div class="detail">
             <div class="item">
               <span class="item-name">商品件数：</span>
-              <span class="item-val">{{ settlementNum }}件</span>
+              <span class="item-val">
+                <countTo
+                  :startVal="0"
+                  :endVal="settlementNum"
+                  :duration="1500"
+                ></countTo
+                >件
+              </span>
             </div>
             <div class="item">
               <span class="item-name">商品总价：</span>
-              <span class="item-val">{{ cartTotalPrice }}元</span>
+              <span class="item-val">
+                <countTo
+                  :startVal="0"
+                  :endVal="cartTotalPrice"
+                  :duration="1500"
+                ></countTo
+                >元
+              </span>
             </div>
             <div class="item">
               <span class="item-name">优惠活动：</span>
@@ -145,45 +166,65 @@
         </div>
       </div>
     </div>
+
     <modal
       title="新增确认"
       btnType="1"
       :showModal="showEditModal"
       @cancel="showEditModal = false"
+      @submit="submitAddress"
     >
       <template v-slot:body>
         <div class="edit-wrap">
           <div class="item">
-            <input type="text" class="input" placeholder="姓名" />
-            <input type="text" class="input" placeholder="手机号" />
+            <input
+              type="text"
+              class="input"
+              placeholder="姓名"
+              v-model="checkedItem.receiverName"
+            />
+            <input
+              type="text"
+              class="input"
+              placeholder="手机号"
+              v-model="checkedItem.receiverMobile"
+            />
           </div>
           <div class="item">
-            <select name="province">
-              <option value="北京">北京</option>
-              <option value="天津">天津</option>
-              <option value="河北">河北</option>
-            </select>
-            <select name="city">
-              <option value="北京">北京</option>
-              <option value="天津">天津</option>
-              <option value="河北">石家庄</option>
-            </select>
-            <select name="district">
-              <option value="北京">昌平区</option>
-              <option value="天津">海淀区</option>
-              <option value="河北">东城区</option>
-              <option value="天津">西城区</option>
-              <option value="河北">顺义区</option>
-              <option value="天津">房山区</option>
-            </select>
+            <v-distpicker
+              :province="checkedItem.receiverProvince"
+              :city="checkedItem.receiverCity"
+              :area="checkedItem.receiverDistrict"
+              @selected="onSelected"
+            ></v-distpicker>
           </div>
           <div class="item">
-            <textarea name="street"></textarea>
+            <textarea
+              name="street"
+              placeholder="详细地址"
+              v-model="checkedItem.receiverAddress"
+            ></textarea>
           </div>
           <div class="item">
-            <input type="text" class="input" placeholder="邮编" />
+            <input
+              type="text"
+              class="input"
+              placeholder="邮编"
+              v-model="checkedItem.receiverZip"
+            />
           </div>
         </div>
+      </template>
+    </modal>
+    <modal
+      title="删除确认"
+      btnType="1"
+      :showModal="showDelModal"
+      @cancel="showDelModal = false"
+      @submit="submitAddress"
+    >
+      <template v-slot:body>
+        <p>您确认要删除此地址吗？</p>
       </template>
     </modal>
   </div>
@@ -192,12 +233,14 @@
 <script>
 import Modal from "./../components/Modal";
 import countTo from "vue-count-to"; // 数字滚动插件
+import VDistpicker from "v-distpicker"; // 三级联动插件
 
 export default {
   name: "order-confirm",
   components: {
     Modal,
-    countTo
+    countTo,
+    VDistpicker
   },
   data() {
     return {
@@ -205,7 +248,10 @@ export default {
       cartList: [], // 购物车中需要结算的商品列表
       cartTotalPrice: 0, // 商品总金额
       settlementNum: 0, // 商品结算数量
-      showEditModal: false
+      checkedItem: {}, // 选中的商品对象
+      userAction: "", // 用户行为 0：新增  1：编辑  2：删除
+      showEditModal: false, // 控制修改、新增模态框
+      showDelModal: false // 控制删除模态框
     };
   },
   mounted() {
@@ -228,10 +274,109 @@ export default {
         this.cartList.map(item => {
           this.settlementNum += item.quantity;
         });
+        // console.log = function() {}; //禁用所有控制台输出
       });
     },
-    openAddressModal() {},
-    orderSubmit() {}
+    // 地址删除、编辑、新增功能
+    submitAddress() {
+      let { checkedItem, userAction } = this;
+      let method,
+        url,
+        params = {};
+      if (userAction == 0) {
+        (method = "post"), (url = "/shippings");
+      } else if (userAction == 1) {
+        (method = "put"), (url = `/shippings/${checkedItem.id}`);
+      } else {
+        (method = "delete"), (url = `/shippings/${checkedItem.id}`);
+      }
+      if (userAction == 0 || userAction == 1) {
+        let {
+          receiverName,
+          receiverMobile,
+          receiverProvince,
+          receiverCity,
+          receiverDistrict,
+          receiverAddress,
+          receiverZip
+        } = checkedItem;
+
+        let errMsg;
+        if (!receiverName) {
+          errMsg = "请输入收货人名称！";
+        } else if (!receiverMobile || !/\d{11}/.test(receiverMobile)) {
+          errMsg = "请输入正确格式的手机号码！";
+        } else if (!receiverProvince || receiverProvince == "省") {
+          errMsg = "请选择对应的城市！";
+        } else if (!receiverCity || receiverCity == "市") {
+          errMsg = "请选择对应的城市！";
+        } else if (
+          !receiverDistrict ||
+          receiverDistrict == "区" ||
+          !receiverAddress
+        ) {
+          errMsg = "请输入收货地址！";
+        } else if (!/\d{6}/.test(receiverZip)) {
+          errMsg = "请输入六位邮编！";
+        }
+        if (errMsg) {
+          this.$notify({
+            title: "警告",
+            message: errMsg,
+            type: "warning"
+          });
+          return;
+        }
+        params = {
+          receiverName,
+          receiverMobile,
+          receiverProvince,
+          receiverCity,
+          receiverDistrict,
+          receiverAddress,
+          receiverZip
+        };
+      }
+      this.axios[method](url, params).then(() => {
+        this.closeModal();
+        this.getAddressList();
+        this.$notify({
+          title: "信息",
+          message: "操作成功",
+          type: "success"
+        });
+      });
+    },
+    // 点击删除按钮事件
+    delAddress(item) {
+      this.checkedItem = item;
+      this.userAction = 2;
+      this.showDelModal = true;
+    },
+    // 打开新增地址模态框
+    openAddressModal() {
+      this.checkedItem = {
+        receiverProvince: "省",
+        receiverCity: "市",
+        receiverDistrict: "区"
+      };
+      this.userAction = 0;
+      this.showEditModal = true;
+    },
+    // 清空地址信息、重置用户行为标识、关闭删除模态框
+    closeModal() {
+      this.checkedItem = {};
+      this.userAction = "";
+      this.showDelModal = false;
+      this.showEditModal = false;
+    },
+    orderSubmit() {},
+    // 三级联动省、市、区事件
+    onSelected(item) {
+      this.checkedItem.receiverProvince = item.province.value;
+      this.checkedItem.receiverCity = item.city.value;
+      this.checkedItem.receiverDistrict = item.area.value;
+    }
   }
 };
 </script>
@@ -265,6 +410,7 @@ export default {
             padding: 15px 24px;
             font-size: 14px;
             color: #757575;
+            margin-bottom: 10px;
           }
           .addr-info {
             cursor: pointer;
@@ -399,6 +545,7 @@ export default {
       .btn-group {
         margin-top: 37px;
         text-align: right;
+        margin-right: 44px;
       }
     }
   }
@@ -406,6 +553,7 @@ export default {
     font-size: 14px;
     .item {
       margin-bottom: 15px;
+      text-align: left;
       .input {
         display: inline-block;
         width: 283px;
