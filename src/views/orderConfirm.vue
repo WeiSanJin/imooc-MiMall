@@ -1,5 +1,8 @@
 <template>
   <div class="order-confirm">
+    <order-header title="订单确认">
+      <span slot="tip">请认真填写收货地址</span>
+    </order-header>
     <svg
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
@@ -97,9 +100,9 @@
               <li v-for="(item, index) in cartList" :key="index">
                 <div class="good-name">
                   <img v-lazy="item.productMainImage" :alt="item.productName" />
-                  <span>{{
-                    item.productName + " " + item.productSubtitle
-                  }}</span>
+                  <span>
+                    {{ item.productName + " " + item.productSubtitle }}
+                  </span>
                 </div>
                 <div class="good-price">
                   {{ item.productPrice }}元 x {{ item.quantity }}
@@ -244,13 +247,14 @@
 import Modal from "./../components/Modal";
 import countTo from "vue-count-to"; // 数字滚动插件
 import VDistpicker from "v-distpicker"; // 三级联动插件
-
+import OrderHeader from "./../components/OrderHeader";
 export default {
   name: "order-confirm",
   components: {
     Modal,
     countTo,
-    VDistpicker
+    VDistpicker,
+    OrderHeader
   },
   data() {
     return {
