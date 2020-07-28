@@ -16,7 +16,7 @@
           <a class="btn" href="javascript:;" v-if="btnType == 2" @click="cancel()">{{ cancelText }}</a>
           <div class="btn-group" v-if="btnType == 3">
             <a href="javascript:;" class="btn" @click="submit()">{{ sureText }}</a>
-            <a href="javascript:;" class="btn" @click="cancel()">{{ cancelText }}</a>
+            <a href="javascript:;" class="btn btn-default" @click="cancel()">{{ cancelText }}</a>
           </div>
         </div>
       </div>

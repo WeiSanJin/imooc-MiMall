@@ -29,6 +29,7 @@ export default {
           payType: 1
         })
         .then(res => {
+          // 支付宝支付：content是html源码，渲染到页面上后自动跳转到支付页面
           this.content = res.content;
           setTimeout(() => {
             document.forms[0].submit();

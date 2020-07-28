@@ -27,35 +27,48 @@ axios.defaults.timeout = 8000;
 // 接口错误拦截
 // eslint-disable-next-line
 axios.interceptors.response.use((response) => {
-  let res = response.data;
-  let path = location.hash;
-  if (res.status == 0) {
-    return res.data;
-  } else if (res.status == 10) {
-    if (path != "#/index") {
-      window.location.href = "/#/login";
-    }
-    return new Promise(resolve => {
-      Vue.prototype.$notify({
-        title: "错误信息",
-        dangerouslyUseHTMLString: true,
-        message: "<br><h3>敲你妈，没登录我怎么知道你购物车有什么？</h3>",
-        type: "error"
+    let res = response.data;
+    let path = location.hash;
+    if (res.status == 0) {
+      return res.data;
+    } else if (res.status == 10) {
+      if (path != "#/index") {
+        window.location.href = "/#/login";
+      }
+      return new Promise(resolve => {
+        Vue.prototype.$notify({
+          title: "错误信息",
+          dangerouslyUseHTMLString: true,
+          message: "<br><h3>敲你妈，没登录我怎么知道你购物车有什么？</h3>",
+          type: "error"
+        });
+        resolve("未登录");
       });
-      resolve("未登录");
-    });
-  } else {
+    } else {
+      return new Promise(resolve => {
+        Vue.prototype.$notify({
+          title: "错误信息",
+          dangerouslyUseHTMLString: true,
+          message: res.msg,
+          type: "error"
+        });
+        resolve(res.msg);
+      });
+    }
+  },
+  error => {
+    let res = error.response;
     return new Promise(resolve => {
       Vue.prototype.$notify({
         title: "错误信息",
         dangerouslyUseHTMLString: true,
-        message: res.msg,
+        message: `<br><h3>${res.data.message}</h3>`,
         type: "error"
       });
       resolve(res.msg);
     });
   }
-});
+);
 
 new Vue({
   store,

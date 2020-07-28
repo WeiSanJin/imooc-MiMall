@@ -78,12 +78,24 @@
       @close="closePayModal"
       :imgs="payImgs"
     ></scan-pay-code>
+    <modal
+      title="支付确认"
+      btnType="3"
+      :showModal="showPayModal"
+      sureText="查看订单"
+      cancelText="未支付"
+      @cancel="showPayModal = false"
+      @submit="goOrderList"
+    >
+      <p slot="body">您确认是否完成支付？</p>
+    </modal>
   </div>
 </template>
 
 <script>
 import QRCode from "qrcode"; // 二维码生成插件
 import ScanPayCode from "./../components/ScanPayCode";
+import Modal from "./../components/Modal";
 export default {
   name: "order-pay",
   data() {
@@ -91,61 +103,92 @@ export default {
       orderId: this.$route.query.orderNo,
       addressInfo: "", // 收货人地址
       orderDetail: [], // 订单详情，包含商品列表
-      payment: 0, // 商品 订单总金额
+      payment: 0, // 商品订单总金额
       showDetail: false, //是否显示订单详情
       payType: "", // 支付类型1：支付宝，2：微信
       showPay: false, //是否显示微信支付弹框
-      payImgs: "" // 微信支付二维码图片地址
+      payImgs: "", // 微信支付二维码图片地址
+      showPayModal: false, // 是否显示二次支付确认弹框
+      T: "" // 定时器ID
     };
   },
   mounted() {
     this.getOrderDetail();
   },
   methods: {
+    // 获取订单详情信息
     getOrderDetail() {
       this.axios.get(`/orders/${this.orderId}`).then(res => {
-        let item = res.shippingVo;
-        this.payment = res.payment;
+        let item = res.shippingVo; // 返回订单收货信息
+        this.payment = res.payment; // 返回订单总金额
         this.addressInfo = `${item.receiverName} ${item.receiverMobile} ${item.receiverProvince} ${item.receiverCity} ${item.receiverDistrict} ${item.receiverAddress}`;
-        this.orderDetail = res.orderItemVoList;
+        this.orderDetail = res.orderItemVoList; // 返回订单商品详情信息
       });
     },
+    // 订单提交
     paySubmit(payType) {
+      // 支付宝支付
       if (payType == 1) {
         window.open("/#/order/alipay?orderId=" + this.orderId, "_blank");
       } else {
+        // 微信支付
         this.axios
           .post("/pay", {
             orderId: this.orderId,
-            orderName: "Vue高仿小米商城",
-            amount: 0.01,
-            payType: 2
+            orderName: "weisanjin.com-Vue全家桶实战 从零独立开发企业级电商系统", // 扫码支付时订单名称
+            amount: 0.01, // 支付的金额，单位元
+            payType: 2 // 支付类型：1支付宝，2微信
           })
           .then(res => {
+            // 微信支付：content内容是支付链接，转换为二维码即可扫码支付
             QRCode.toDataURL(res.content)
               .then(url => {
-                this.showPay = true;
-                this.payImgs = url;
-                console.log(url);
+                this.showPay = true; // 关闭微信支付弹窗
+                this.payImgs = url; // 向微信弹窗子组件传入二维码图片地址
+                this.loopOrderState(); // 轮询订单支付情况
               })
-              .catch(err => {
-                console.log(err);
+              .catch(() => {
+                // 如果二维码生成失败进行提示
                 this.$notify({
+                  type: "error",
                   title: "错误提示",
                   dangerouslyUseHTMLString: true,
-                  message: "<br><h3>微信二维码生成失败，请稍后重试！</h3>",
-                  type: "error"
+                  message: "<br><h3>微信二维码生成失败，请稍后重试！</h3>"
                 });
               });
           });
       }
     },
+    // 关闭微信弹框
     closePayModal() {
-      this.showPay = false;
+      this.showPay = false; // 微信支付弹框
+      this.showPayModal = true; // 微信确认支付弹框
+      /* 显示当前时间 ( setInterval() 函数会每秒执行一次函数，类似手表)
+         使用 clearInterval() 来停止执行:*/
+      clearInterval(this.T);
+    },
+    // 轮询当前订单支付状态
+    loopOrderState() {
+      // setTimeout只在指定时间后执行一次
+      // setInterval以指定时间为周期循环执行
+      this.T = setInterval(() => {
+        this.axios.get(`/orders/${this.orderId}`).then(res => {
+          // 订单状态:0-已取消-10-未付款，20-已付款，40-已发货，50-交易成功，60-交易关闭
+          if (res.status == 20) {
+            clearInterval(this.T);
+            this.goOrderList();
+          }
+        });
+      }, 1000);
+    },
+    // 跳转到订单列表
+    goOrderList() {
+      this.$router.push("/order/list");
     }
   },
   components: {
-    ScanPayCode
+    ScanPayCode,
+    Modal
   }
 };
 </script>
