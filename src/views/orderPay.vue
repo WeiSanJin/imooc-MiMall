@@ -32,7 +32,7 @@
           <div class="item-detail" v-if="showDetail">
             <div class="item">
               <div class="detail-title">订单号：</div>
-              <div class="detail-info theme-color">{{ orderNo }}</div>
+              <div class="detail-info theme-color">{{ orderId }}</div>
             </div>
             <div class="item">
               <div class="detail-title">收货信息：</div>
@@ -73,22 +73,29 @@
         </div>
       </div>
     </div>
-    <scan-pay-code v-if="showPay"></scan-pay-code>
+    <scan-pay-code
+      v-if="showPay"
+      @close="closePayModal"
+      :imgs="payImgs"
+    ></scan-pay-code>
   </div>
 </template>
 
 <script>
+import QRCode from "qrcode"; // 二维码生成插件
+import ScanPayCode from "./../components/ScanPayCode";
 export default {
   name: "order-pay",
   data() {
     return {
-      orderNo: this.$route.query.orderNo,
+      orderId: this.$route.query.orderNo,
       addressInfo: "", // 收货人地址
       orderDetail: [], // 订单详情，包含商品列表
       payment: 0, // 商品 订单总金额
       showDetail: false, //是否显示订单详情
       payType: "", // 支付类型1：支付宝，2：微信
-      showPay: false //是否显示微信支付弹框
+      showPay: false, //是否显示微信支付弹框
+      payImgs: "" // 微信支付二维码图片地址
     };
   },
   mounted() {
@@ -96,7 +103,7 @@ export default {
   },
   methods: {
     getOrderDetail() {
-      this.axios.get(`/orders/${this.orderNo}`).then(res => {
+      this.axios.get(`/orders/${this.orderId}`).then(res => {
         let item = res.shippingVo;
         this.payment = res.payment;
         this.addressInfo = `${item.receiverName} ${item.receiverMobile} ${item.receiverProvince} ${item.receiverCity} ${item.receiverDistrict} ${item.receiverAddress}`;
@@ -105,9 +112,40 @@ export default {
     },
     paySubmit(payType) {
       if (payType == 1) {
-        window.open("/#/order/alipay?orderId=" + this.orderNo, "_blank");
+        window.open("/#/order/alipay?orderId=" + this.orderId, "_blank");
+      } else {
+        this.axios
+          .post("/pay", {
+            orderId: this.orderId,
+            orderName: "Vue高仿小米商城",
+            amount: 0.01,
+            payType: 2
+          })
+          .then(res => {
+            QRCode.toDataURL(res.content)
+              .then(url => {
+                this.showPay = true;
+                this.payImgs = url;
+                console.log(url);
+              })
+              .catch(err => {
+                console.log(err);
+                this.$notify({
+                  title: "错误提示",
+                  dangerouslyUseHTMLString: true,
+                  message: "<br><h3>微信二维码生成失败，请稍后重试！</h3>",
+                  type: "error"
+                });
+              });
+          });
       }
+    },
+    closePayModal() {
+      this.showPay = false;
     }
+  },
+  components: {
+    ScanPayCode
   }
 };
 </script>

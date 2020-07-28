@@ -10,6 +10,7 @@
   "dependencies": {
     "axios": "^0.19.2",
     "core-js": "^3.6.5",
+    "qrcode": "^1.4.4",
     "swiper": "^4.5.1",
     "v-distpicker": "^1.2.7",
     "vue": "^2.6.11",
