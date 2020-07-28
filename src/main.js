@@ -45,8 +45,15 @@ axios.interceptors.response.use((response) => {
       resolve("未登录");
     });
   } else {
-    Vue.prototype.$message(res.msg);
-    return Promise.reject(res);
+    return new Promise(resolve => {
+      Vue.prototype.$notify({
+        title: "错误信息",
+        dangerouslyUseHTMLString: true,
+        message: res.msg,
+        type: "error"
+      });
+      resolve(res.msg);
+    });
   }
 });
 
