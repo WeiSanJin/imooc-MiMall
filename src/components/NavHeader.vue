@@ -12,7 +12,9 @@
           <a href="javascript:;" v-if="userName">{{ userName }}</a>
           <a href="javascript:;" v-if="!userName" @click="login">登录</a>
           <a href="javascript:;" v-if="userName" @click="logout">退出</a>
-          <a href="javascript:;" v-if="userName">我的订单</a>
+          <a href="javascript:;" v-if="userName" @click="goOrderList"
+            >我的订单</a
+          >
           <a href="javascript:;" class="my-cart" @click="goTocart">
             <span class="icon-cart"></span>
             购物车({{ cartCount }})
@@ -209,6 +211,9 @@ export default {
         // to-do 保存到Vuex里面
         this.$store.dispatch("saveCartCount", res);
       });
+    },
+    goOrderList() {
+      this.$router.push("/order/list");
     },
     goTocart() {
       this.$router.push("/cart");
